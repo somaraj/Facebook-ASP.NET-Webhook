@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web;
 using System.Web.Http;
 using FacebookLeadAdsWebhooks.Model;
@@ -11,9 +14,13 @@ namespace FacebookLeadAdsWebhooks.Controller
     {
         #region Get Request
         [HttpGet]
-        public string Get()
+        public HttpResponseMessage Get()
         {
-            var response = HttpContext.Current.Request.QueryString["hub.challenge"];
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(HttpContext.Current.Request.QueryString["hub.challenge"])
+            };
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/plain");
             return response;
         }
         #endregion Get Request
