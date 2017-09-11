@@ -4,9 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using FacebookLeadAdsWebhooks.Model;
+using Newtonsoft.Json;
 
 namespace FacebookLeadAdsWebhooks.Controller
 {
@@ -28,23 +30,47 @@ namespace FacebookLeadAdsWebhooks.Controller
         #region Post Request
 
         [HttpPost]
-        public void Post([FromBody] JsonData data)
+        public async Task<HttpResponseMessage> Post([FromBody] JsonData data)
         {
             try
             {
                 var entry = data.Entry.FirstOrDefault();
-                //Get change
                 var change = entry?.Changes.FirstOrDefault();
-                if (change == null) return;
+                if (change == null) return new HttpResponseMessage(HttpStatusCode.BadRequest);
 
-                //Get lead Id
-                var leadId = change.Value.LeadGenId;
+                //Generate user access token here https://developers.facebook.com/tools/accesstoken/
+                const string token = "<USER TOKEN>";
 
-                //Lead Id is used for further processing
+                var leadUrl = $"https://graph.facebook.com/v2.10/{change.Value.LeadGenId}?access_token={token}";
+                var formUrl = $"https://graph.facebook.com/v2.10/{change.Value.FormId}?access_token={token}";
+
+                using (var httpClientLead = new HttpClient())
+                {
+                    var response = await httpClientLead.GetStringAsync(formUrl);
+                    if (!string.IsNullOrEmpty(response))
+                    {
+                        var jsonObjLead = JsonConvert.DeserializeObject<LeadFormData>(response);
+                        //jsonObjLead.Name contains the lead ad name
+
+                        //If response is valid get the field data
+                        using (var httpClientFields = new HttpClient())
+                        {
+                            var responseFields = await httpClientFields.GetStringAsync(leadUrl);
+                            if (!string.IsNullOrEmpty(responseFields))
+                            {
+                                var jsonObjFields = JsonConvert.DeserializeObject<LeadData>(responseFields);
+                                //jsonObjFields.FieldData contains the field value
+                            }
+                        }
+                    }
+                }
+                return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                Trace.TraceError($"Error >> {ex.Message} >> StackTrace {ex.StackTrace}");
+                Trace.WriteLine($"Error-->{ex.Message}");
+                Trace.WriteLine($"StackTrace-->{ex.StackTrace}");
+                return new HttpResponseMessage(HttpStatusCode.BadGateway);
             }
         }
 
