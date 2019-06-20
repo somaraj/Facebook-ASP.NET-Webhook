@@ -1,4 +1,4 @@
-[![Gitter](https://badges.gitter.im/Facebook-ASP-NET-Webhook/developers.svg)](https://gitter.im/Facebook-ASP-NET-Webhook/developers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gitter](https://badges.gitter.im/Facebook-ASP-NET-Webhook/fb-asp-net-webhook.svg)](https://gitter.im/Facebook-ASP-NET-Webhook/fb-asp-net-webhook?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 # Retrieving facebook leads using ASP.NET Web API and Graph API Webhooks
 
