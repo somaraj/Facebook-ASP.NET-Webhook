@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace FacebookLeadAdsWebhooks.Model
 {
-    public class JsonData
+    public class JsonDataModel
     {
         [JsonProperty("entry")]
         public List<Entry> Entry { get; set; }
